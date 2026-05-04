@@ -1,0 +1,54 @@
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Movement_and_SpriteSheet_together
+{
+    public class MovementManager
+    {
+        public Vector2 position { get; private set; }
+        private float _speed = 150f;
+        public Vector2 currentDirection { get; private set; }
+
+        public MovementManager(Vector2 startPosition)
+        {
+            position = startPosition;
+        }
+
+        public void Update(GameTime gameTime)
+        {
+            var keyboardState = Keyboard.GetState();
+            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            Vector2 direction = Vector2.Zero;
+
+            if (keyboardState.IsKeyDown(Keys.W))
+                direction.Y -= 1;
+            if (keyboardState.IsKeyDown(Keys.S))
+                direction.Y += 1;
+            if (keyboardState.IsKeyDown(Keys.A))
+                direction.X -= 1;
+            if (keyboardState.IsKeyDown(Keys.D))
+                direction.X += 1;
+
+            // Prevents faster diagonal movement
+            if (direction != Vector2.Zero)
+                direction.Normalize();
+                
+            currentDirection = direction;
+
+            // _speed * dt ensures consistent movement regardless of frame rate
+            position += direction * _speed * dt;
+        }
+    
+        public void Draw(SpriteBatch spriteBatch)
+        {
+
+        }
+    }
+}

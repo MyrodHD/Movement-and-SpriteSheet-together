@@ -1,0 +1,87 @@
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+
+namespace Movement_and_SpriteSheet_together
+{
+    public class Game1 : Game
+    {
+        private GraphicsDeviceManager _graphics;
+        private SpriteBatch _spriteBatch;
+
+        public Game1()
+        {
+            _graphics = new GraphicsDeviceManager(this);
+            Content.RootDirectory = "Content";
+            IsMouseVisible = true;
+        }
+
+        SpriteManager _playerSprite;
+        MovementManager _movement;
+
+        Texture2D playerTexture;
+        Texture2D rectangleTexure;
+
+        protected override void Initialize()
+        {
+            // TODO: Add your initialization logic here
+
+            base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            // TODO: use this.Content to load your game content here
+            playerTexture = Content.Load<Texture2D>("player_hat_spritesheet");
+            rectangleTexure = Content.Load<Texture2D>("rectangle");
+
+            _playerSprite = new SpriteManager(playerTexture, 4, 4);
+            _movement = new MovementManager(new Vector2(100,100));
+        }
+
+        protected override void Update(GameTime gameTime)
+        {
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+                Exit();
+
+            // TODO: Add your update logic here
+
+            _movement.Update(gameTime);
+
+            if (_movement.currentDirection != Vector2.Zero)
+            {
+                _playerSprite.Update(gameTime);
+
+                if (_movement.currentDirection.Y > 0)
+                    _playerSprite.currentRow = 0;
+                else if (_movement.currentDirection.X < 0)
+                    _playerSprite.currentRow = 1;
+                else if (_movement.currentDirection.X > 0)
+                    _playerSprite.currentRow = 2;
+                else if (_movement.currentDirection.Y < 0)
+                    _playerSprite.currentRow = 3;
+            }
+            else
+                _playerSprite.Reset();
+
+            base.Update(gameTime);
+        }
+
+        protected override void Draw(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            // TODO: Add your drawing code here
+
+            _spriteBatch.Begin();
+
+            _playerSprite.Draw(_spriteBatch, _movement.position);
+
+            _spriteBatch.End();
+
+            base.Draw(gameTime);
+        }
+    }
+}
