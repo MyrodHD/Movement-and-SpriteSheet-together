@@ -15,9 +15,14 @@ namespace Movement_and_SpriteSheet_together
         private float _speed = 150f;
         public Vector2 currentDirection { get; private set; }
 
-        public MovementManager(Vector2 startPosition)
+        private ParticleSystem _particleSystem;
+        private float _dustTimer;
+        private const float dustInterval = 0.15f;
+
+        public MovementManager(Vector2 startPosition, ParticleSystem particleSystem)
         {
             position = startPosition;
+            _particleSystem = particleSystem;
         }
 
         public void Update(GameTime gameTime)
@@ -38,17 +43,27 @@ namespace Movement_and_SpriteSheet_together
 
             // Prevents faster diagonal movement
             if (direction != Vector2.Zero)
+            {
                 direction.Normalize();
-                
-            currentDirection = direction;
+
+                _dustTimer -= dt;
+                if (_dustTimer <= 0)
+                {
+                    Vector2 feetOffset = new Vector2(24, 58);
+                    _particleSystem.CreateDustBurst(position + feetOffset);
+
+                    _dustTimer = dustInterval;
+                }
+            }
+            else
+            {
+                 _dustTimer = 0; // Reset timer when not moving
+            }
+                currentDirection = direction;
 
             // _speed * dt ensures consistent movement regardless of frame rate
             position += direction * _speed * dt;
         }
     
-        public void Draw(SpriteBatch spriteBatch)
-        {
-
-        }
     }
 }

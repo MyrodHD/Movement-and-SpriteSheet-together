@@ -18,9 +18,11 @@ namespace Movement_and_SpriteSheet_together
 
         SpriteManager _playerSprite;
         MovementManager _movement;
+        ParticleSystem _particleSystem;
 
         Texture2D playerTexture;
         Texture2D rectangleTexure;
+        Texture2D particleTexure;
 
         protected override void Initialize()
         {
@@ -36,9 +38,13 @@ namespace Movement_and_SpriteSheet_together
             // TODO: use this.Content to load your game content here
             playerTexture = Content.Load<Texture2D>("player_hat_spritesheet");
             rectangleTexure = Content.Load<Texture2D>("rectangle");
+            particleTexure = Content.Load<Texture2D>("circle");
 
             _playerSprite = new SpriteManager(playerTexture, 4, 4);
-            _movement = new MovementManager(new Vector2(100,100));
+            
+            _particleSystem = new ParticleSystem(particleTexure);
+
+            _movement = new MovementManager(new Vector2(100,100), _particleSystem);
         }
 
         protected override void Update(GameTime gameTime)
@@ -49,6 +55,7 @@ namespace Movement_and_SpriteSheet_together
             // TODO: Add your update logic here
 
             _movement.Update(gameTime);
+            _particleSystem.Update(gameTime);
 
             if (_movement.currentDirection != Vector2.Zero)
             {
@@ -78,6 +85,7 @@ namespace Movement_and_SpriteSheet_together
             _spriteBatch.Begin();
 
             _playerSprite.Draw(_spriteBatch, _movement.position);
+            _particleSystem.Draw(_spriteBatch);
 
             _spriteBatch.End();
 
