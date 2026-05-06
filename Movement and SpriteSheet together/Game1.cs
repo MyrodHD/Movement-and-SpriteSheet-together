@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace Movement_and_SpriteSheet_together
 {
@@ -9,6 +10,15 @@ namespace Movement_and_SpriteSheet_together
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        public enum GameState
+        {
+            MainMenu,
+            Playing,
+            Controls
+        }
+
+        GameState _currentState = GameState.MainMenu;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -16,6 +26,7 @@ namespace Movement_and_SpriteSheet_together
             IsMouseVisible = true;
         }
 
+        MenuManager _menuManager;
         SpriteManager _playerSprite;
         MovementManager _movement;
         ParticleSystem _particleSystem;
@@ -24,9 +35,13 @@ namespace Movement_and_SpriteSheet_together
         Texture2D rectangleTexure;
         Texture2D particleTexure;
 
+        SpriteFont _font;
+
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+
+            _currentState = GameState.MainMenu;
 
             base.Initialize();
         }
@@ -39,6 +54,11 @@ namespace Movement_and_SpriteSheet_together
             playerTexture = Content.Load<Texture2D>("player_hat_spritesheet");
             rectangleTexure = Content.Load<Texture2D>("rectangle");
             particleTexure = Content.Load<Texture2D>("circle");
+
+            _font = Content.Load<SpriteFont>("TitleFont");
+            List<string> menuItems = new List<string> { "Start Game", "Controls" };
+            
+            _menuManager = new MenuManager(_font, menuItems);
 
             _playerSprite = new SpriteManager(playerTexture, 4, 4);
             
@@ -54,24 +74,43 @@ namespace Movement_and_SpriteSheet_together
 
             // TODO: Add your update logic here
 
-            _movement.Update(gameTime);
-            _particleSystem.Update(gameTime);
-
-            if (_movement.currentDirection != Vector2.Zero)
+            switch (_currentState)
             {
-                _playerSprite.Update(gameTime);
+                case GameState.MainMenu:
+                    _menuManager.Update(gameTime, ref _currentState);
 
-                if (_movement.currentDirection.Y > 0)
-                    _playerSprite.currentRow = 0;
-                else if (_movement.currentDirection.X < 0)
-                    _playerSprite.currentRow = 1;
-                else if (_movement.currentDirection.X > 0)
-                    _playerSprite.currentRow = 2;
-                else if (_movement.currentDirection.Y < 0)
-                    _playerSprite.currentRow = 3;
+                    break;
+      
+                case GameState.Playing:
+                    _movement.Update(gameTime);
+                    _particleSystem.Update(gameTime);
+
+                    if (_movement.currentDirection != Vector2.Zero)
+                    {
+                        _playerSprite.Update(gameTime);
+
+                        if (_movement.currentDirection.Y > 0)
+                            _playerSprite.currentRow = 0;
+                        else if (_movement.currentDirection.X < 0)
+                            _playerSprite.currentRow = 1;
+                        else if (_movement.currentDirection.X > 0)
+                            _playerSprite.currentRow = 2;
+                        else if (_movement.currentDirection.Y < 0)
+                            _playerSprite.currentRow = 3;
+                    }
+                    else
+                        _playerSprite.Reset();
+
+                    break;
+                
+                case GameState.Controls:
+                    if (Keyboard.GetState().IsKeyDown(Keys.R))
+                        _currentState = GameState.MainMenu;
+
+                    break;
             }
-            else
-                _playerSprite.Reset();
+
+            
 
             base.Update(gameTime);
         }
@@ -84,8 +123,16 @@ namespace Movement_and_SpriteSheet_together
 
             _spriteBatch.Begin();
 
-            _playerSprite.Draw(_spriteBatch, _movement.position);
-            _particleSystem.Draw(_spriteBatch);
+            if (_currentState == GameState.MainMenu)
+            {
+                _menuManager.Draw(_spriteBatch);
+            }
+
+            if (_currentState == GameState.Playing)
+            {
+                _playerSprite.Draw(_spriteBatch, _movement.position);
+                _particleSystem.Draw(_spriteBatch);
+            }
 
             _spriteBatch.End();
 
