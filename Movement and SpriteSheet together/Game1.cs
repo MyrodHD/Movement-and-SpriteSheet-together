@@ -82,7 +82,6 @@ namespace Movement_and_SpriteSheet_together
             {
                 case GameState.MainMenu:
                     _menuManager.Update(gameTime, ref _currentState);
-
                     break;
       
                 case GameState.Playing:
@@ -102,19 +101,14 @@ namespace Movement_and_SpriteSheet_together
                         else if (_movement.currentDirection.Y < 0)
                             _playerSprite.currentRow = 3;
                     }
-
                     else
                         _playerSprite.Reset();
-
-                    if (Keyboard.GetState().IsKeyDown(Keys.B))
-                        _currentState = GameState.Battle;
 
                     break;
                 
                 case GameState.Controls:
                     if (Keyboard.GetState().IsKeyDown(Keys.R))
                         _currentState = GameState.MainMenu;
-
                     break;
                 
                 case GameState.Battle:
