@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,58 @@ namespace Movement_and_SpriteSheet_together
         private List<Combatant.Hero> _heros;
         private List<Combatant.Enemy> _enemies;
 
+        // Turn Queue
+        private Queue<Combatant> _turnQueue = new();
 
+        private Combatant _currentActor;
+        private BattleAction _pendingAction;
+
+        private float _stateTimer = 0f; // for timed transitions
+        private const float start_delay = 1.5f;
+
+        public List<string> BattleLog { get; } = new(); // Feed to UI
+
+        public BattleManager(List<Combatant.Hero> heroes, List<Combatant.Enemy> enemies)
+        {
+            _heros = heroes;
+            _enemies = enemies;
+        }
+
+        public void Update(GameTime gameTime)
+        {
+            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            switch (state)
+            {
+                case BattleState.Start:
+
+                    break;
+
+                case BattleState.PlayerTurn:
+                    // Input is handled externally - call SubmitPlayerAction()
+                    break;
+
+                case BattleState.EnemyTurn:
+                    //HandleEnemyTurn();
+                    break;
+            };
+        
+        }
+
+        public void HandleStart(float dt)
+        {
+            _stateTimer += dt;
+            if (_stateTimer >= start_delay)
+            {
+                _stateTimer = 0f;
+                //BuildTurnQueue();
+                //AdvanceTurn();
+            }
+        }
+    
+        public void HandleEnemyTurn()
+        {
+
+        }
     }
 }
