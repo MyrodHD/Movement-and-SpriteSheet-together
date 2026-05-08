@@ -14,7 +14,8 @@ namespace Movement_and_SpriteSheet_together
         {
             MainMenu,
             Playing,
-            Controls
+            Controls,
+            Battle
         }
 
         GameState _currentState = GameState.MainMenu;
@@ -36,6 +37,7 @@ namespace Movement_and_SpriteSheet_together
         Texture2D particleTexure;
 
         SpriteFont _font;
+        SpriteFont _battleFont;
 
         protected override void Initialize()
         {
@@ -56,6 +58,8 @@ namespace Movement_and_SpriteSheet_together
             particleTexure = Content.Load<Texture2D>("circle");
 
             _font = Content.Load<SpriteFont>("TitleFont");
+            _battleFont = Content.Load<SpriteFont>("BattleFont");
+
             List<string> menuItems = new List<string> { "Start Game", "Controls" };
             
             _menuManager = new MenuManager(_font, menuItems);
@@ -98,8 +102,12 @@ namespace Movement_and_SpriteSheet_together
                         else if (_movement.currentDirection.Y < 0)
                             _playerSprite.currentRow = 3;
                     }
+
                     else
                         _playerSprite.Reset();
+
+                    if (Keyboard.GetState().IsKeyDown(Keys.B))
+                        _currentState = GameState.Battle;
 
                     break;
                 
@@ -108,9 +116,11 @@ namespace Movement_and_SpriteSheet_together
                         _currentState = GameState.MainMenu;
 
                     break;
-            }
+                
+                case GameState.Battle:
 
-            
+                    break;
+            }
 
             base.Update(gameTime);
         }
@@ -132,6 +142,11 @@ namespace Movement_and_SpriteSheet_together
             {
                 _playerSprite.Draw(_spriteBatch, _movement.position);
                 _particleSystem.Draw(_spriteBatch);
+            }
+
+            if (_currentState == GameState.Battle)
+            {
+
             }
 
             _spriteBatch.End();
