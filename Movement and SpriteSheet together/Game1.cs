@@ -39,6 +39,9 @@ namespace Movement_and_SpriteSheet_together
         SpriteFont _font;
         SpriteFont _battleFont;
 
+        BattleSystem _battleSystem;
+        private bool _battleStarted = false;
+
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
@@ -69,6 +72,8 @@ namespace Movement_and_SpriteSheet_together
             _particleSystem = new ParticleSystem(particleTexure);
 
             _movement = new MovementManager(new Vector2(100,100), _particleSystem);
+
+            _battleSystem = new BattleSystem();
         }
 
         protected override void Update(GameTime gameTime)
@@ -104,6 +109,15 @@ namespace Movement_and_SpriteSheet_together
                     else
                         _playerSprite.Reset();
 
+                    if (Keyboard.GetState().IsKeyDown(Keys.B) && !_battleStarted)
+                    {
+                        var hero = new Hero("Hero", 30, 6);
+                        var enemy = new Enemy("Goblin", 18, 3);
+                        _battleSystem.BattleStart(hero, enemy);
+                        _battleStarted = true;
+                        _currentState = GameState.Battle;
+                    }
+
                     break;
                 
                 case GameState.Controls:
@@ -112,7 +126,19 @@ namespace Movement_and_SpriteSheet_together
                     break;
                 
                 case GameState.Battle:
+                    _battleSystem.Update(gameTime);
 
+                    if (Keyboard.GetState().IsKeyDown(Keys.Space))
+                    {
+                        _battleSystem.HeroAttack();
+                    }
+
+                    if ((_battleSystem.State == BattleState.Win || _battleSystem.State == BattleState.Lose && Keyboard.GetState().IsKeyDown(Keys.R)))
+                    {
+                        _currentState = GameState.Playing;
+                        _battleStarted = false;
+                    }
+                        
                     break;
             }
 
@@ -140,8 +166,16 @@ namespace Movement_and_SpriteSheet_together
 
             if (_currentState == GameState.Battle)
             {
+                var hero = _battleSystem.Hero;
+                var enemy = _battleSystem.Enemy;
 
+                _spriteBatch.DrawString(_battleFont, $"Player: {hero.Name}  HP: {hero.HP}/{hero.MaxHP}", new Vector2(50, 50), Color.White);
+                _spriteBatch.DrawString(_battleFont, $"Enemy: {enemy.Name}  HP: {enemy.HP}", new Vector2(50, 90), Color.White);
+                _spriteBatch.DrawString(_battleFont, $"State: {_battleSystem.State}", new Vector2(50, 140), Color.Yellow);
+                _spriteBatch.DrawString(_battleFont, $"Action: {_battleSystem.LastAction}", new Vector2(50, 180), Color.White);
+                _spriteBatch.DrawString(_battleFont, "Press SPACE to attack (PlayerTurn). Press R after Win/Lose to return.", new Vector2(50, 220), Color.LightGray);
             }
+        
 
             _spriteBatch.End();
 
