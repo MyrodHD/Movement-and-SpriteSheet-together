@@ -70,6 +70,18 @@ namespace Movement_and_SpriteSheet_together
             _turnTimer = 0f;
         }
 
+        public void HeroHeal()
+        {
+            if (State != BattleState.PlayerTurn) return;
+
+            int heals = GetRandomHeal(_hero.HP);
+            _hero.Heal(heals);
+            LastAction = $"{_hero.Name} heals for {heals} amount of health.";
+
+            State = BattleState.EnemyTurn;
+            _turnTimer = 0f;
+        }
+
         private void EnemyAttack()
         {
             if (State != BattleState.EnemyTurn)
@@ -93,6 +105,12 @@ namespace Movement_and_SpriteSheet_together
         {
             int damage = _rng.Next(0, 3);
             return baseAttack + damage;
+        }
+
+        public int GetRandomHeal(int baseHeal)
+        {
+            int heal = _rng.Next(3, _hero.MaxHP / 2);
+            return heal;
         }
     }
 }

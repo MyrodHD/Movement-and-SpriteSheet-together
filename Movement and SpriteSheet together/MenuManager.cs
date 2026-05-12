@@ -43,7 +43,7 @@ namespace Movement_and_SpriteSheet_together
             if (_currentState.IsKeyDown(Keys.Enter) && _previousState.IsKeyUp(Keys.Enter))
             {
                 if (_selectedIndex == 0)
-                    currentState = Game1.GameState.Playing;
+                    currentState = Game1.GameState.Level1;
                 else if (_selectedIndex == 1)
                     currentState = Game1.GameState.Controls;
             }
