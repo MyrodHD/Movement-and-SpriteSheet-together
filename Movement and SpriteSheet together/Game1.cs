@@ -40,6 +40,9 @@ namespace Movement_and_SpriteSheet_together
         Texture2D heroTexture;
         Texture2D enemyTexture;
 
+        Texture2D battleHeroTexture;
+        Rectangle battleHeroRect;
+
         SpriteFont _font;
         SpriteFont _battleFont;
 
@@ -58,6 +61,8 @@ namespace Movement_and_SpriteSheet_together
 
             _currentState = GameState.MainMenu;
 
+            battleHeroRect = new Rectangle(150,155,65,75);
+
             base.Initialize();
         }
 
@@ -69,6 +74,7 @@ namespace Movement_and_SpriteSheet_together
             playerTexture = Content.Load<Texture2D>("player_hat_spritesheet");
             rectangleTexure = Content.Load<Texture2D>("rectangle");
             particleTexure = Content.Load<Texture2D>("circle");
+            battleHeroTexture = Content.Load<Texture2D>("rectangle");
 
             _font = Content.Load<SpriteFont>("TitleFont");
             _battleFont = Content.Load<SpriteFont>("BattleFont");
@@ -85,7 +91,7 @@ namespace Movement_and_SpriteSheet_together
 
             _battleSystem = new BattleSystem();
 
-            _hero = new Hero("Hero", 30, 3);
+            _hero = new Hero("Hero", 30, 4, battleHeroTexture, battleHeroRect);
 
             _playerFrameWidth = playerTexture.Width / 4;  
             _playerFrameHeight = playerTexture.Height / 4; 
@@ -208,13 +214,14 @@ namespace Movement_and_SpriteSheet_together
                 var hero = _battleSystem.Hero;
                 var enemy = _battleSystem.Enemy;
 
-                _spriteBatch.DrawString(_battleFont, $"Player: {hero.Name}  HP: {hero.HP}/{hero.MaxHP}", new Vector2(50, 190), Color.White);
-                _spriteBatch.DrawString(_battleFont, $"Enemy: {enemy.Name}  HP: {enemy.HP}", new Vector2(500, 190), Color.White);
+                _spriteBatch.Draw(battleHeroTexture, battleHeroRect, Color.Blue);
+                _spriteBatch.DrawString(_battleFont, $"Enemy: {enemy.Name}  HP: {enemy.HP}", new Vector2(450, 190), Color.White);
                 _spriteBatch.DrawString(_battleFont, $"State: {_battleSystem.State}", new Vector2(50, 50), Color.Yellow);
                 _spriteBatch.DrawString(_battleFont, $"Action: {_battleSystem.LastAction}", new Vector2(50, 70), Color.White);
-                _spriteBatch.DrawString(_battleFont, "Press SPACE to attack.", new Vector2(50, 260), Color.LightGray);
+                _spriteBatch.DrawString(_battleFont, "Press SPACE to attack.", new Vector2(50, 275), Color.LightGray);
+
                 if (_battleSystem.State == BattleState.Win || _battleSystem.State == BattleState.Lose)
-                    _spriteBatch.DrawString(_battleFont, "Press R to Exit battle", new Vector2(50,285), Color.White);
+                    _spriteBatch.DrawString(_battleFont, "Press R to Exit battle", new Vector2(50,295), Color.White);
             }
         
 
