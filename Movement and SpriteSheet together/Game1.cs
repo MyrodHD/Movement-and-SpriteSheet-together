@@ -33,6 +33,7 @@ namespace Movement_and_SpriteSheet_together
         SpriteManager _playerSprite;
         MovementManager _movement;
         ParticleSystem _particleSystem;
+        BattleMenu _battleMenu;
 
         Texture2D playerTexture;
         Texture2D rectangleTexure;
@@ -92,6 +93,8 @@ namespace Movement_and_SpriteSheet_together
             _battleSystem = new BattleSystem();
 
             _hero = new Hero("Hero", 30, 4, battleHeroTexture, battleHeroRect);
+
+            _battleMenu = new BattleMenu(_battleFont, new List<string> { "Attack", "Heal" }, new Vector2(50, 260));
 
             _playerFrameWidth = playerTexture.Width / 4;  
             _playerFrameHeight = playerTexture.Height / 4; 
@@ -158,6 +161,34 @@ namespace Movement_and_SpriteSheet_together
                 case GameState.Battle:
                     _battleSystem.Update(gameTime);
 
+                    _battleMenu.Update(gameTime);
+
+                    // Consume menu selection and map to actions
+                    if (_battleMenu.ConsumeSelection(out var selected))
+                    {
+                        switch (selected)
+                        {
+                            case 0: // Attack
+                                _battleSystem.HeroAttack();
+                                break;
+                            case 1: // Heal
+                                _battleSystem.HeroHeal();
+                                break;
+
+                        }
+                    }
+
+                    // allow quick keyboard shortcuts as well (Debug Reasons)
+                    //var kb = Keyboard.GetState();
+                    //if (kb.IsKeyDown(Keys.Space))
+                    //{
+                    //    _battleSystem.HeroAttack();
+                    //}
+                    //if (kb.IsKeyDown(Keys.H))
+                    //{
+                    //    _battleSystem.HeroHeal();
+                    //}
+
                     if (Keyboard.GetState().IsKeyDown(Keys.Space))
                     {
                         _battleSystem.HeroAttack();
@@ -197,7 +228,7 @@ namespace Movement_and_SpriteSheet_together
 
             if (_currentState == GameState.Level1)
             {
-                
+
                 _playerSprite.Draw(_spriteBatch, _movement.position);
                 _particleSystem.Draw(_spriteBatch);
 
@@ -215,13 +246,17 @@ namespace Movement_and_SpriteSheet_together
                 var enemy = _battleSystem.Enemy;
 
                 _spriteBatch.Draw(battleHeroTexture, battleHeroRect, Color.Blue);
+                _spriteBatch.DrawString(_battleFont, $"HP: {hero.HP}", new Vector2(158, 240), Color.White);
                 _spriteBatch.DrawString(_battleFont, $"Enemy: {enemy.Name}  HP: {enemy.HP}", new Vector2(450, 190), Color.White);
                 _spriteBatch.DrawString(_battleFont, $"State: {_battleSystem.State}", new Vector2(50, 50), Color.Yellow);
                 _spriteBatch.DrawString(_battleFont, $"Action: {_battleSystem.LastAction}", new Vector2(50, 70), Color.White);
-                _spriteBatch.DrawString(_battleFont, "Press SPACE to attack.", new Vector2(50, 275), Color.LightGray);
+
+
+                if (_battleSystem.State == BattleState.PlayerTurn)
+                    _battleMenu.Draw(_spriteBatch, Color.White, Color.Yellow);
 
                 if (_battleSystem.State == BattleState.Win || _battleSystem.State == BattleState.Lose)
-                    _spriteBatch.DrawString(_battleFont, "Press R to Exit battle", new Vector2(50,295), Color.White);
+                    _spriteBatch.DrawString(_battleFont, "Press R to Exit battle", new Vector2(50,305), Color.White);
             }
         
 
